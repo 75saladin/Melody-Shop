@@ -1,0 +1,11 @@
+- Make song variables get grabbed from a config file, and copy the config file with each recording.
+- Upload recordings
+- Refactor melody
+- Document code
+- Make it take arguments: recording flag (edit README)
+- Push code
+- Tree implementation of rhythm
+- Use rhythm tree to play "plinko" to pick where notes start
+- Abstract scales, chords, notes are the same thing: Tonic with pitch class members. They are only different when you rasterize them to a collection of pitches
+- Unit tests
+- Implement theory parsing player? Maybe a separate project using this as a module

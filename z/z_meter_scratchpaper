@@ -1,0 +1,25 @@
+let length = len(beatscheme)*product(divisions)
+
+divisions = 2, 2
+x x x x x x x x x x x x x x x x
+0 x x x 2 x x x 1 x x x 3 x x x		beat scheme. Place at multiples of length/len(beatscheme).
+let length /= 1stdivision
+0 x 4 x		for each filled, place 1stdivision-1 new values. Place at multiples of length/1stdivision. value=itself+1*len(beatscheme)
+let length /= 2nddivision
+0 x		for each filled, place 2nddivision-1 new values. Place at multiples of length/2nddivision. value=itself+2*len(beatscheme)
+
+divisions = 2, 2, 2
+00 xx xx xx xx xx xx xx 02 xx xx xx xx xx xx xx 01 xx xx xx xx xx xx xx 03 xx xx xx xx xx xx xx		beat scheme
+let length /= 1stdivision
+00 xx xx xx 04 xx xx xx		for each filled, place 1stdivision-1 new values. Place at multiples of length/1stdivision. value=itself+1*len(beatscheme)
+let length /= 2nddivision
+00 xx 08 xx	for each filled, place 2nddivision-1 new values. Place at multiples of length/2nddivision. value=itself+2*len(beatscheme)
+ let length /= 3rddivision
+00 16	for each filled, place 3rddivision-1 new values. Place at multiples of length/3rddivision. value=itself+4*len(beatscheme)0,
+
+
+00 08 04 12 02 10 06 14 01 09 05 13 03 11 07 15
+_____ _____ __ _____ __ __ _____ ________ _____
+do a shrink or grow when it's good
+favor shrinks over grows; aim to end negative
+last beat -= size_change
