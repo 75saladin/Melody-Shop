@@ -30,7 +30,11 @@ class Scale(object):
         "harmin": Set([0, 2, 3, 5, 7, 8, 11]),
         "mjpent": Set([0, 2, 4, 7, 9]),
         "mnpent": Set([0, 3, 5, 7, 10]),
-        "blues": Set([0, 3, 5, 6, 7, 10])
+        "blues": Set([0, 3, 5, 6, 7, 10]),
+        # Fake scales, Todo implement general abstract note thing
+        "note": Set([0]),
+        "diablos": Set([0, 6]),
+        "beeth": Set([0, 7])        
     }
 
     def __init__(self, tonic, scale):

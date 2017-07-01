@@ -38,18 +38,20 @@ INSTRUMENTS = [
 ]
 REC_FORMAT = "wav"
 
-def preamble(record=False):
+def preamble(record=False, name=""):
     """Initialize things that would go at the top of a scorefile.
 
     Args:
         record (bool): Whether or not to record this piece. Default False
+        name (str): Name for output file, to be placed before the timestamp.
     """
 
     rtsetparams(SAMPLE_RATE, CHANNELS)
     load_instruments()
+    control_rate(SAMPLE_RATE)
     print_off()
 
-    name = rec_name()
+    name = rec_name(name)
     if record:
             rtoutput(name, REC_FORMAT)
     # RTcmix doesn't like prompts for input, or else this would work
@@ -63,13 +65,15 @@ def load_instruments():
     for i in INSTRUMENTS:
         load(i)
 
-def rec_name():
+def rec_name(prefix):
     """Gets a unique name for the recording to avoid name clashes.
 
+    Args:
+        prefix (str): The prefix to the timestamp
     Returns:
         str: The unique name
     """
-    name = ""
+    name = prefix if prefix=="" else prefix+" "
     n = datetime.now()
     d = [str(n.year), str(n.month), str(n.day)]
     t = [str(n.hour), str(n.minute), str(n.second)]
@@ -78,7 +82,11 @@ def rec_name():
     return name + date + "--" + time + "." + REC_FORMAT
 
 def play(start, melody, tempo, amp, env=1, type="sine"):
-    """Plays a melody using WAVETABLE."""
+    """Plays a melody using WAVETABLE.
+    Todo: Decide if there should be different plays for different things or if
+        everything should evaluate to a melody play call.
+    """
+    wave = maketable("wave", 5000, type)
     beat_dur = 60.0/tempo
     sb_per = len(melody.meter)/melody.meter.beats
     sb_dur = beat_dur/sb_per
@@ -86,7 +94,7 @@ def play(start, melody, tempo, amp, env=1, type="sine"):
     for i in range(len(melody)):
         dur = sb_dur * melody.rhythm.sequence[i]
         pitch = cpsmidi(melody.pitches.sequence[i])
-        WAVETABLE(start, dur, amp*env, pitch, .5, type)
+        WAVETABLE(start, dur, amp*env, pitch, .5, wave)
         start += dur
 
     return start
@@ -97,7 +105,7 @@ def hold_first_beat(start, melody, tempo, amp, beats, env=1, type="sine"):
     WAVETABLE(start, dur, amp*env, cpsmidi(melody.pitches.sequence[0]), .5, type)
 
 
-def adsr(prop=[1,1,6,3,1], val=[1,.6,.6,0] ):
+def adsr(prop=[1,1,6,3,1], val=[.9,.6,.6,0] ):
     """Gets an ADSR envelope.
     Args:
         prop (list): A 5-item list representing relative length of the
@@ -109,10 +117,12 @@ def adsr(prop=[1,1,6,3,1], val=[1,.6,.6,0] ):
         raise ValueError("Lists do not match.")
     if len(prop) is not 5 or len(val) is not 4:
         raise ValueError("Lists are not size 4.")
-    return maketable(
-        "line", 50*sum(prop), 0,0, prop[0], val[0], prop[0]+prop[1], val[1],
-        prop[0]+prop[1]+prop[2], val[2], prop[0]+prop[1]+prop[2]+prop[3],
-        val[3], sum(prop), 0)
+
+    linelist = [0,0]
+    for i in range(len(val)): linelist.extend([sum(prop[0:i+1]), val[i]])
+    linelist.extend([sum(prop), 0])
+
+    return maketable("line", 1000, *linelist)
 
 def test():
     """Play a 5-second 440Hz sine wave for testing purposes."""

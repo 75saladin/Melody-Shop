@@ -1,18 +1,45 @@
 # Make sure python knows to import modules from the current working directory.
-# For an explanation of why this is necessary, see the README.
-import sys
-import os
-sys.path.append(os.getcwd())
+# For an explanation of why this is necessary, see the README   # #
+import sys                                                      # #
+import os                                                       # #
+sys.path.append(os.getcwd())                                    # #
 
 from util.Minc import *
 from util.PitchSequence import *
 from util.RhythmSequence import *
 from util.Melody import *
 from util.Meter import *
+import random
 
+global BEAT_SCHEMES
+global DIVISIONS
+BEAT_SCHEMES = {
+    "hip": [2, 0, 3, 1],
+    "square": [0, 2, 1, 3]
+}
+DIVISIONS = {
+    "4": [2, 2, 2]
+}
+
+# Todo: These globals from config file
 global RHYTHM_FUZZ_ITERATIONS
-RHYTHM_FUZZ_ITERATIONS = 5
+global SCALE_TYPE
+global TEMPO
+global TONIC
+global BEAT
+global DIVISION
+RHYTHM_FUZZ_ITERATIONS = 5000
+SCALE_TYPE = "mnpent"
+TEMPO = 60
+TONIC = random.randint(1, 6)
+BEAT = "hip"
+DIVISION = "4"
 
+preamble(True, "{}{} {}{} F{}".format(
+    SCALE_TYPE, TONIC, BEAT, DIVISION, RHYTHM_FUZZ_ITERATIONS
+))
+
+# NOTE: This is one-measure phrases, always. Might be best to make melodies out of multple less busy measures.
 def get_melody(notes, meter, scale, rstyle, rmax, mmin, mmax, mline, r=None):
     """Gets a melody fitting the parameters"""
     if mline:
@@ -28,16 +55,17 @@ def get_melody(notes, meter, scale, rstyle, rmax, mmin, mmax, mline, r=None):
     return Melody(p, r, meter)
 
 def getA():
-    tonic = 6
-    scale_type = "major"
-    beat_scheme = [0, 2, 1, 3]
-    divisions = [2,2,2]
+    tonic = TONIC
+    scale_type = SCALE_TYPE
+    beat_scheme = BEAT_SCHEMES[BEAT]
+    divisions = DIVISIONS[DIVISION]
     meter = Meter(beat_scheme, divisions)
+    bass_meter = Meter(BEAT_SCHEMES["square"], divisions)
     scale = Scale(tonic, scale_type)
 
     mnotes = [len(meter)/2, 3*len(meter)/5, len(meter)/5, 2*len(meter)/5, len(meter)-5]
-    mmini = [tonic + 12*5 - 2, tonic + 12*5 + 7, tonic + 12*6 - 2, tonic + 12*6 + 7, tonic + 12*6 - 2]
-    mmaxi = [tonic + 12*6 + 7, tonic + 12*7 + 10, tonic + 12*7 + 7, tonic + 12*8 + 10, tonic+ 12*9 + 7]
+    mmini = [tonic + 12*5 - 2, tonic + 12*5 + 3, tonic + 12*6 - 5, tonic + 12*6 + 7, tonic + 12*6 - 2]
+    mmaxi = [tonic + 12*6 + 7, tonic + 12*7 + 6, tonic + 12*7 + 10, tonic + 12*8 + 6, tonic+ 12*8 + 7]
     mrmax = len(meter)/len(beat_scheme)
 
     bknotes = len(meter)/4
@@ -72,262 +100,262 @@ def getA():
             )
         ),
         ( # bassline (ostinato)
-            get_melody(bnotes, meter, scale, "rand", brmax, bmini, bmaxi, False)
+            get_melody(bnotes, bass_meter, scale, "rand", brmax, bmini, bmaxi, False)
         )
     )
 
 
-
-preamble(True)
+# Todo: Refactor into structure of sections with melodies and roles, relative amplitudes, envs, whatever other profiles the generation of the music
 a_section = getA()
 env = adsr()
 bg_env = adsr([3,3,3,3,1])
 st = 0
-tempo = 60
-amp = 10000
-bg_amp_mult = 1
+tempo = TEMPO
+amp = 4000
+bg_amp_mult = .6
+bass_amp_mult = 1.3
 
 # Bass by itself twice (AA)
-st = play(st, a_section[2], tempo, amp, env, "sine")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult*bass_amp_mult, env, "saw3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult*bass_amp_mult, env, "saw3")
 
 # Bass + melody (AABA)
-play(st, a_section[0][0], tempo, amp, env, "square")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][1], tempo, amp, env, "square")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][1], tempo, amp, env, "square3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass + bkgnds (AABA)
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass+Bkgnds+melody (AABA)
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][1], tempo, amp, env, "square")
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][1], tempo, amp, env, "square3")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass + bkgnds (AABA)
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass+Bkgnds+2ndmelody (AABA)
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][3], tempo, amp, env, "square")
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][3], tempo, amp, env, "square3")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass+Bkgnds+melody (AABA)
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][1], tempo, amp, env, "square")
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][1], tempo, amp, env, "square3")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass by itself twice (AA)
-st = play(st, a_section[2], tempo, amp, env, "sine")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Everything (AABA)
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][1], tempo, amp, env, "square")
-play(st, a_section[0][3], tempo, amp, env, "square")
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][1], tempo, amp, env, "square3")
+play(st, a_section[0][3], tempo, amp, env, "square3")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Everything+high busy line(AABA)
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[0][4], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[0][4], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[0][4], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[0][4], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][1], tempo, amp, env, "square")
-play(st, a_section[0][3], tempo, amp, env, "square")
-play(st, a_section[0][4], tempo, amp, env, "square")
-play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][1], tempo, amp, env, "square3")
+play(st, a_section[0][3], tempo, amp, env, "square3")
+play(st, a_section[0][4], tempo, amp, env, "square3")
+play(st, a_section[1][1][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
-play(st, a_section[0][0], tempo, amp, env, "square")
-play(st, a_section[0][2], tempo, amp, env, "square")
-play(st, a_section[0][4], tempo, amp, env, "square")
-play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, amp, env, "square3")
+play(st, a_section[0][2], tempo, amp, env, "square3")
+play(st, a_section[0][4], tempo, amp, env, "square3")
+play(st, a_section[1][0][0], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Everything+high busy line(AABA)
 new_amp = amp - amp/5
-play(st, a_section[0][0], tempo, new_amp, env, "square")
-play(st, a_section[0][2], tempo, new_amp, env, "square")
-play(st, a_section[0][4], tempo, new_amp, env, "square")
-play(st, a_section[1][0][0], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, new_amp, env, "square3")
+play(st, a_section[0][2], tempo, new_amp, env, "square3")
+play(st, a_section[0][4], tempo, new_amp, env, "square3")
+play(st, a_section[1][0][0], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 new_amp -= amp/5
 
-play(st, a_section[0][0], tempo, new_amp, env, "square")
-play(st, a_section[0][2], tempo, new_amp, env, "square")
-play(st, a_section[0][4], tempo, new_amp, env, "square")
-play(st, a_section[1][0][0], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, new_amp, env, "square3")
+play(st, a_section[0][2], tempo, new_amp, env, "square3")
+play(st, a_section[0][4], tempo, new_amp, env, "square3")
+play(st, a_section[1][0][0], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 new_amp -= amp/5
 
-play(st, a_section[0][1], tempo, new_amp, env, "square")
-play(st, a_section[0][3], tempo, new_amp, env, "square")
-play(st, a_section[0][4], tempo, new_amp, env, "square")
-play(st, a_section[1][1][0], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][1], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][1][2], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][1], tempo, new_amp, env, "square3")
+play(st, a_section[0][3], tempo, new_amp, env, "square3")
+play(st, a_section[0][4], tempo, new_amp, env, "square3")
+play(st, a_section[1][1][0], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][1], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][1][2], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 new_amp -= amp/5
 
-play(st, a_section[0][0], tempo, new_amp, env, "square")
-play(st, a_section[0][2], tempo, new_amp, env, "square")
-play(st, a_section[0][4], tempo, new_amp, env, "square")
-play(st, a_section[1][0][0], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][1], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-play(st, a_section[1][0][2], tempo, new_amp*bg_amp_mult, bg_env, "tri")
-st = play(st, a_section[2], tempo, amp, env, "sine")
+play(st, a_section[0][0], tempo, new_amp, env, "square3")
+play(st, a_section[0][2], tempo, new_amp, env, "square3")
+play(st, a_section[0][4], tempo, new_amp, env, "square3")
+play(st, a_section[1][0][0], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][1], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+play(st, a_section[1][0][2], tempo, new_amp*bg_amp_mult, bg_env, "tri10")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
 
 # Bass by itself twice (AA)
-st = play(st, a_section[2], tempo, amp, env, "sine")
-st = play(st, a_section[2], tempo, amp, env, "sine")
-hold_first_beat(st, a_section[2], tempo, amp, 2, adsr([1,1,10,3,0]))
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
+st = play(st, a_section[2], tempo, amp*bass_amp_mult, env, "saw3")
+hold_first_beat(st, a_section[2], tempo, amp*bass_amp_mult, 2, adsr([1,1,10,3,0]))
 
 
 # Old idea:
