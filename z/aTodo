@@ -4,6 +4,7 @@
 - make it print to a log file, make script read out log file after. That'll teach PYCMIX to intercept MY prints!
 - Document code
 - Make it take arguments: recording flag (edit README)
+- Amek a branch for advcompmusicproject
 - Push code
 - Tree implementation of rhythm
 - Use rhythm tree to play "plinko" to pick where notes start
