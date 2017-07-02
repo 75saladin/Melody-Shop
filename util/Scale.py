@@ -21,7 +21,7 @@ class Scale(object):
     """
     global KNOWN_SCALES
     KNOWN_SCALES = {
-        "arbitrary": Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+        "chrom": Set([i for i in range(12)]),
         "major": Set([0, 2, 4, 5, 7, 9, 11]),
         "whole": Set([0, 2, 4, 6, 8, 10]),
         "octwh": Set([0, 2, 3, 5, 6, 8, 9, 11]),
@@ -31,10 +31,14 @@ class Scale(object):
         "mjpent": Set([0, 2, 4, 7, 9]),
         "mnpent": Set([0, 3, 5, 7, 10]),
         "blues": Set([0, 3, 5, 6, 7, 10]),
+        "gypsy": Set([0, 1, 4, 5, 7, 8, 11]),
+        "qtpent": Set([0, 3.5, 5, 7, 10.5]),
+        "qchrom": Set([i/2.0 for i in range(24)]),
+        "microaf": Set([i/4.0 for i in range(48)]),
         # Fake scales, Todo implement general abstract note thing
         "note": Set([0]),
         "diablos": Set([0, 6]),
-        "beeth": Set([0, 7])        
+        "beeth": Set([0, 7])
     }
 
     def __init__(self, tonic, scale):

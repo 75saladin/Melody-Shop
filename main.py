@@ -28,11 +28,11 @@ global TEMPO
 global TONIC
 global BEAT
 global DIVISION
-RHYTHM_FUZZ_ITERATIONS = 5000
-SCALE_TYPE = "mnpent"
+RHYTHM_FUZZ_ITERATIONS = 5
+SCALE_TYPE = "microaf"
 TEMPO = 60
 TONIC = random.randint(1, 6)
-BEAT = "hip"
+BEAT = "square"
 DIVISION = "4"
 
 preamble(True, "{}{} {}{} F{}".format(
