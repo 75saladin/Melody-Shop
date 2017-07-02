@@ -8,9 +8,8 @@ from datetime import datetime
 
 This module is an attempt to factor out calls to rtcmix functions, such
 that all score scripts do not have to import the rtcmix library.
-Theoretically, these functions could be re-implemented to implement the
-same script in a different sound processing environment. In practice,
-that would be messy unless it's an RTcmix clone.
+This can be abstracted to some kind of interface, where this code would be an
+Implementation for RTcmix. Implementations could exist for other frameworks.
 
 Global contants:
     SAMPLE_RATE (int): Sample rate for the entire score.
