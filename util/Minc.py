@@ -30,14 +30,14 @@ global CHANNELS
 global INSTRUMENTS
 global REC_FORMAT
 SAMPLE_RATE = 44100
-CHANNELS = 2
+CHANNELS = 1
 INSTRUMENTS = [
     "WAVETABLE",
     "FMINST"
 ]
 REC_FORMAT = "wav"
 
-def preamble(record=False, name=""):
+def preamble(record=False, name="rec-"):
     """Initialize things that would go at the top of a scorefile.
 
     Args:
@@ -48,15 +48,15 @@ def preamble(record=False, name=""):
     rtsetparams(SAMPLE_RATE, CHANNELS)
     load_instruments()
     control_rate(SAMPLE_RATE)
-    print_off()
 
     name = rec_name(name)
     if record:
-            rtoutput(name, REC_FORMAT)
+        rtoutput(name)
     # RTcmix doesn't like prompts for input, or else this would work
     #else:  # Caller did not specify whether or not to record
     #    if raw_input("Record this? (y/n)  ")[0].lower()=='y':
     #        rtoutput(name, REC_FORMAT)
+    print_off()
 
 
 def load_instruments():

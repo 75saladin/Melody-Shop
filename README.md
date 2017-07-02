@@ -7,6 +7,8 @@ This project started as my final project for [Dr. Jerod Sommerfeldt](https://jer
 
 In order to run this project, you must have the standalone version of RTcmix installed on your machine such that you can run PYCMIX. Your default python version (ie the one that is used when you call "python" on the command line) must be 2.x for PYCMIX to work correctly.
 
+You may edit any of the variables found in config.py to affect the generated piece. 
+
 Only from the top-level directory (where main.py resides), use the following command:
 ```./play PYCMIX```
 You may specify an absolute path to PYCMIX if you have not installed it globally:

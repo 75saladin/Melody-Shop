@@ -1,3 +1,8 @@
 $1 < main.py
 mkdir -p recordings
-mv *.wav recordings/
+for i in *.wav; do # should only be 1 but just in case
+  folder=$(echo $i | cut -f 1 -d '.')
+  mkdir recordings/$folder
+  mv $i recordings/$folder/
+  cp config.py recordings/$folder/
+done
