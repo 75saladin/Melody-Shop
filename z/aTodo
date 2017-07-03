@@ -1,5 +1,4 @@
 For 1.0:
-  - Fix no rtoutput bug
   - Refactor melody
   - make it print to a log file, make script read out log file after. That'll teach PYCMIX to intercept MY prints!
   - Document code

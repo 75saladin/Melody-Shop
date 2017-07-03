@@ -72,7 +72,7 @@ def rec_name(prefix):
     Returns:
         str: The unique name
     """
-    name = prefix if prefix=="" else prefix+" "
+    name = prefix if (prefix is "" or prefix.endswith("-")) else prefix+" "
     n = datetime.now()
     d = [str(n.year), str(n.month), str(n.day)]
     t = [str(n.hour), str(n.minute), str(n.second)]
