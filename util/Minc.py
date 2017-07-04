@@ -1,5 +1,6 @@
 from __future__ import print_function
 from rtcmix import *
+import rtcmix
 import math
 import random
 from datetime import datetime
@@ -36,6 +37,7 @@ INSTRUMENTS = [
     "FMINST"
 ]
 REC_FORMAT = "wav"
+
 
 def preamble(record=False, name="rec-"):
     """Initialize things that would go at the top of a scorefile.
@@ -79,6 +81,13 @@ def rec_name(prefix):
     date = "-".join(d)
     time = ":".join(t)
     return name + date + "--" + time + "." + REC_FORMAT
+
+def args():
+    """Rips command-line arguments from RTcmix's cold, dead hands."""
+    list = []
+    for i in range(n_arg()):
+        list.append(s_arg(i))
+    return list
 
 def play(start, melody, tempo, amp, env=1, type="sine"):
     """Plays a melody using WAVETABLE.

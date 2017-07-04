@@ -1,4 +1,5 @@
-$1 < main.py
+pmix=`cat pycmix`
+eval $pmix $@ < main.py
 mkdir -p recordings
 for i in *.wav; do # should only be 1 but just in case
   folder=$(echo $i | cut -f 1 -d '.')

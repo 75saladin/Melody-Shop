@@ -12,8 +12,12 @@ from util.Melody import *
 from util.Meter import *
 import config
 
+# Doesn't work, MINC's native args, don't work, fix when response from mailing list
+if "-nr" in sys.argv: rec = False
+else: rec = True
+
 # Preamble for RTcmix # # # # # # # # # # # # # # # # # # # # # # #
-preamble(True)                                                  # #
+preamble(rec)                                                   # #
 
 # NOTE: This is one-measure phrases, always. Might be best to make melodies out of multple less busy measures.
 def get_melody(notes, meter, scale, rstyle, rmax, mmin, mmax, mline, r=None):

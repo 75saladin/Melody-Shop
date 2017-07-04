@@ -5,14 +5,15 @@ This project started as my final project for [Dr. Jerod Sommerfeldt](https://jer
 
 ### Running instructions:
 
-In order to run this project, you must have the standalone version of RTcmix installed on your machine such that you can run PYCMIX. Your default python version (ie the one that is used when you call "python" on the command line) must be 2.x for PYCMIX to work correctly.
+In order to run this project, you must have the standalone version of RTcmix, configured for python, installed on your machine.If you have the python version, your RTcmix/bin/ directory will contain PYCMIX. Your default python version (ie the one that is used when you call "python" on the command line) must be 2.x for PYCMIX to work correctly.
 
-You may edit any of the variables found in config.py to affect the generated piece. 
+If you need to use an absolute path to run PYCMIX (that is, simply running `PYCMIX` does not work for you), edit the file `pycmix` to be your path to the  PYCMIX binary. Otherwise, leave `pycmix` as `PYCMIX`.
 
-Only from the top-level directory (where main.py resides), use the following command:
-```./play PYCMIX```
-You may specify an absolute path to PYCMIX if you have not installed it globally:
-```./play ~/RTcmix/bin/PYCMIX```
+Finally, from the top-level directory (where main.py resides), use the following command:
+```./play```
+
+You may edit any of the variables found in config.py to affect the generated piece.
+
 If you want to record a run, then edit main.py's call to preamble(). Make it "preamble(True)".
 
 _____
