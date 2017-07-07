@@ -1,8 +1,6 @@
 For 1.0:
   - Refactor melody
-  - make it print to a log file, make script read out log file after. That'll teach PYCMIX to intercept MY prints!
   - Document code
-  - Make it take arguments: recording flag (edit README)
   - Upload recordings
   - Merge 1.0 to master
 - Tree implementation of rhythm

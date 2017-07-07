@@ -2,6 +2,7 @@
 # For an explanation of why this is necessary, see the README   # #
 import sys                                                      # #
 import os                                                       # #
+print sys.argv
 sys.path.append(os.getcwd())                                    # #
 
 import random
@@ -12,8 +13,8 @@ from util.Melody import *
 from util.Meter import *
 import config
 
-# Doesn't work, MINC's native args, don't work, fix when response from mailing list
-if "-nr" in sys.argv: rec = False
+# Parse command-line arguments - ALL TILDES(~) NOT DASHES(-)
+if "~nr" in sys.argv: rec = False
 else: rec = True
 
 # Preamble for RTcmix # # # # # # # # # # # # # # # # # # # # # # #

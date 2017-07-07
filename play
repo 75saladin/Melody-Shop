@@ -1,3 +1,6 @@
+# for arg in $@; do
+#   [[ $arg =~ ^- ]] && echo "replace echo with swapping - for ~"
+# done
 pmix=`cat pycmix`
 eval $pmix $@ < main.py
 mkdir -p recordings

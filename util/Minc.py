@@ -38,7 +38,6 @@ INSTRUMENTS = [
 ]
 REC_FORMAT = "wav"
 
-
 def preamble(record=False, name="rec-"):
     """Initialize things that would go at the top of a scorefile.
 
