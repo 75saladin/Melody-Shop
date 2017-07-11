@@ -4,6 +4,7 @@ For 1.0:
   - Upload recordings
   - Merge 1.0 to master
 - Tree implementation of rhythm
+- play script todos
 - Use rhythm tree to play "plinko" to pick where notes start
 - Abstract scales, chords, notes are the same thing: Tonic with pitch class members. They are only different when you rasterize them to a collection of pitches
 - Unit tests
