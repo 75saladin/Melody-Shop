@@ -5,13 +5,26 @@ This project started as my final project for [Dr. Jerod Sommerfeldt](https://jer
 
 ### Running instructions:
 
-In order to run this project, you must have the standalone version of RTcmix installed on your machine such that you can run PYCMIX. Your default python version (ie the one that is used when you call "python" on the command line) must be 2.x for PYCMIX to work correctly.
+In order to run this project, you must have the standalone version of RTcmix, configured for python, installed on your machine. To verify that your copy of RTcmix is configured for python, try running the command `PYCMIX` (or check your RTcmix/bin/ directory will contain PYCMIX). Your default python version (check by running the command `python --version`) must be 2.x for PYCMIX to work correctly.
 
-Only from the top-level directory (where main.py resides), use the following command:
-```./play PYCMIX```
-You may specify an absolute path to PYCMIX if you have not installed it globally:
-```./play ~/RTcmix/bin/PYCMIX```
-If you want to record a run, then edit main.py's call to preamble(). Make it "preamble(True)".
+If you need to use an absolute path to run PYCMIX (that is, simply running `PYCMIX` does not work for you), create a file called `pycmix.cfg` in the root project folder. Edit it to contain one line: the path to your PYCMIX binary. Example contents:
+```
+~/RTcmix/bin/PYCMIX
+```
+
+Finally, from the top-level directory (where main.py resides), use the following command:
+ ```
+ ./play
+ ```
+
+Each run is recorded by default and sorted into the recordings directory. If you would like to skip recording, use the `-nr` flag:
+ ```
+./play -nr
+```
+
+Several minor file/directory name configurations can be edited in the script `play`.
+
+You may edit any of the variables found in `config.py` to affect the generated piece.
 
 _____
 ### FAQ:

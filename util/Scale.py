@@ -37,7 +37,7 @@ class Scale(object):
         "microaf": Set([i/4.0 for i in range(48)]),
         # Fake scales, Todo implement general abstract note thing
         "note": Set([0]),
-        "diablos": Set([0, 6]),
+        "diabolus": Set([0, 6]),
         "beeth": Set([0, 7])
     }
 

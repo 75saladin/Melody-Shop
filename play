@@ -1,3 +1,28 @@
-$1 < main.py
-mkdir -p recordings
-mv *.wav recordings/
+#!/bin/bash
+
+## Configs:
+# Manual configurations
+rec_dir=recordings/
+
+# Configs grabbed from one-line text files
+cmd=pycmix.cfg # pycmix.cfg contains path of PYCMIX command
+
+## Script:
+# Convert - to ~ in args to avoid clashes with RTcmix's short-circuiting flags
+args=${@//-/\~}  # Todo: Use regex to match ^- and " -" instead of every dash
+
+# Get contents of config files or enact defaults
+# Todo: replace template with loop
+cmd="$(echo `cat $cmd 2>/dev/null` | tr -d '[:space:]')"
+[[ "$cmd" == "" ]] && cmd='PYCMIX'
+
+eval $cmd $args < main.py
+
+mkdir -p $rec_dir
+for i in *.wav; do # should only be 1 but just in case
+  [ -f "$i" ] || break
+  target=$rec_dir$(echo $i | cut -f 1 -d '.')
+  mkdir $target
+  mv $i $target
+  cp config.py $target
+done

@@ -2,42 +2,23 @@
 # For an explanation of why this is necessary, see the README   # #
 import sys                                                      # #
 import os                                                       # #
+print sys.argv
 sys.path.append(os.getcwd())                                    # #
 
+import random
 from util.Minc import *
 from util.PitchSequence import *
 from util.RhythmSequence import *
 from util.Melody import *
 from util.Meter import *
-import random
+import config
 
-global BEAT_SCHEMES
-global DIVISIONS
-BEAT_SCHEMES = {
-    "hip": [2, 0, 3, 1],
-    "square": [0, 2, 1, 3]
-}
-DIVISIONS = {
-    "4": [2, 2, 2]
-}
+# Parse command-line arguments - ALL TILDES(~) NOT DASHES(-)
+if "~nr" in sys.argv: rec = False
+else: rec = True
 
-# Todo: These globals from config file
-global RHYTHM_FUZZ_ITERATIONS
-global SCALE_TYPE
-global TEMPO
-global TONIC
-global BEAT
-global DIVISION
-RHYTHM_FUZZ_ITERATIONS = 5
-SCALE_TYPE = "microaf"
-TEMPO = 60
-TONIC = random.randint(1, 6)
-BEAT = "square"
-DIVISION = "4"
-
-preamble(True, "{}{} {}{} F{}".format(
-    SCALE_TYPE, TONIC, BEAT, DIVISION, RHYTHM_FUZZ_ITERATIONS
-))
+# Preamble for RTcmix # # # # # # # # # # # # # # # # # # # # # # #
+preamble(rec)                                                   # #
 
 # NOTE: This is one-measure phrases, always. Might be best to make melodies out of multple less busy measures.
 def get_melody(notes, meter, scale, rstyle, rmax, mmin, mmax, mline, r=None):
@@ -49,18 +30,18 @@ def get_melody(notes, meter, scale, rstyle, rmax, mmin, mmax, mline, r=None):
 
     if r is None:
         r = RhythmSequence()
-        r.gen_from_meter(meter, notes, RHYTHM_FUZZ_ITERATIONS, rstyle, rmax)
+        r.gen_from_meter(meter, notes, config.fuzz, rstyle, rmax)
     p = PitchSequence()
     p.gen_from_scale(notes, scale, mline, mstyle, mmin, mmax)
     return Melody(p, r, meter)
 
 def getA():
-    tonic = TONIC
-    scale_type = SCALE_TYPE
-    beat_scheme = BEAT_SCHEMES[BEAT]
-    divisions = DIVISIONS[DIVISION]
+    tonic = config.tonic
+    scale_type = config.scale
+    beat_scheme = config.mbeats[config.beat]
+    divisions = config.mdivs[config.div]
     meter = Meter(beat_scheme, divisions)
-    bass_meter = Meter(BEAT_SCHEMES["square"], divisions)
+    bass_meter = Meter(config.mbeats[config.bass_beat], divisions)
     scale = Scale(tonic, scale_type)
 
     mnotes = [len(meter)/2, 3*len(meter)/5, len(meter)/5, 2*len(meter)/5, len(meter)-5]
@@ -110,7 +91,7 @@ a_section = getA()
 env = adsr()
 bg_env = adsr([3,3,3,3,1])
 st = 0
-tempo = TEMPO
+tempo = config.tempo
 amp = 4000
 bg_amp_mult = .6
 bass_amp_mult = 1.3
