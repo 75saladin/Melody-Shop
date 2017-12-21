@@ -1,8 +1,11 @@
-For 1.0:
+For 1.1:
   - Refactor melody
   - Document code
   - Upload recordings
-  - Merge 1.0 to master
+  - Merge 1.1 to master
+  
+=======
+  
 - Tree implementation of rhythm
 - play script todos
 - Use rhythm tree to play "plinko" to pick where notes start
