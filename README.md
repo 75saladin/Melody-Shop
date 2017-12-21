@@ -1,4 +1,4 @@
-# Melody Generator
+# Melody Shop
 This project is written in python 2, but is intended to be run in the digital sound synthesis and signal-processing framework RTcmix. This project uses the python version of RTcmix. For more information on RTcmix, see rtcmix.org.
 
 This project started as my final project for [Dr. Jerod Sommerfeldt](https://jerodsommerfeldt.com/)'s course Advanced Computer Music at SUNY Potsdam's Crane School of Music. Since then, I have been working on it as a project to represent musical theory concepts in code. It can be used as originally designed, to interface with RTcmix and experiment with generated music, but I also plan to import the non-RTcmix portions in projects that need music theory for its own sake or to interface with other sound frameworks.
