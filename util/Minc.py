@@ -1,5 +1,6 @@
 from __future__ import print_function
 from rtcmix import *
+import rtcmix
 import math
 import random
 from datetime import datetime
@@ -8,9 +9,8 @@ from datetime import datetime
 
 This module is an attempt to factor out calls to rtcmix functions, such
 that all score scripts do not have to import the rtcmix library.
-Theoretically, these functions could be re-implemented to implement the
-same script in a different sound processing environment. In practice,
-that would be messy unless it's an RTcmix clone.
+This can be abstracted to some kind of interface, where this code would be an
+Implementation for RTcmix. Implementations could exist for other frameworks.
 
 Global contants:
     SAMPLE_RATE (int): Sample rate for the entire score.
@@ -31,14 +31,14 @@ global CHANNELS
 global INSTRUMENTS
 global REC_FORMAT
 SAMPLE_RATE = 44100
-CHANNELS = 2
+CHANNELS = 1
 INSTRUMENTS = [
     "WAVETABLE",
     "FMINST"
 ]
 REC_FORMAT = "wav"
 
-def preamble(record=False, name=""):
+def preamble(record=False, name="rec-"):
     """Initialize things that would go at the top of a scorefile.
 
     Args:
@@ -49,15 +49,15 @@ def preamble(record=False, name=""):
     rtsetparams(SAMPLE_RATE, CHANNELS)
     load_instruments()
     control_rate(SAMPLE_RATE)
-    print_off()
 
     name = rec_name(name)
     if record:
-            rtoutput(name, REC_FORMAT)
+        rtoutput(name)
     # RTcmix doesn't like prompts for input, or else this would work
     #else:  # Caller did not specify whether or not to record
     #    if raw_input("Record this? (y/n)  ")[0].lower()=='y':
     #        rtoutput(name, REC_FORMAT)
+    print_off()
 
 
 def load_instruments():
@@ -73,13 +73,20 @@ def rec_name(prefix):
     Returns:
         str: The unique name
     """
-    name = prefix if prefix=="" else prefix+" "
+    name = prefix if (prefix is "" or prefix.endswith("-")) else prefix+" "
     n = datetime.now()
     d = [str(n.year), str(n.month), str(n.day)]
     t = [str(n.hour), str(n.minute), str(n.second)]
     date = "-".join(d)
     time = ":".join(t)
     return name + date + "--" + time + "." + REC_FORMAT
+
+def args():
+    """Rips command-line arguments from RTcmix's cold, dead hands."""
+    list = []
+    for i in range(n_arg()):
+        list.append(s_arg(i))
+    return list
 
 def play(start, melody, tempo, amp, env=1, type="sine"):
     """Plays a melody using WAVETABLE.
